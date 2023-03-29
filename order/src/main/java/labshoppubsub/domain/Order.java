@@ -26,16 +26,25 @@ public class Order {
 
     @PostPersist
     public void onPostPersist() {
+        //Following code causes dependency to external APIs
+        // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+
+        labshoppubsub.external.DecreaseStockCommand decreaseStockCommand = new labshoppubsub.external.DecreaseStockCommand();
+        // mappings goes here
+        OrderApplication.applicationContext
+            .getBean(labshoppubsub.external.InventoryService.class)
+            .decreaseStock(/* get???(), */decreaseStockCommand);
+
         OrderPlaced orderPlaced = new OrderPlaced(this);
         orderPlaced.publishAfterCommit();
     }
 
     @PrePersist
     public void onPrePersist() {
-        // Get request from Inventory
-        //labshoppubsub.external.Inventory inventory =
-        //    Application.applicationContext.getBean(labshoppubsub.external.InventoryService.class)
-        //    .getInventory(/** mapping value needed */);
+        // Get request from Order
+        //labshoppubsub.external.Order order =
+        //    Application.applicationContext.getBean(labshoppubsub.external.OrderService.class)
+        //    .getOrder(/** mapping value needed */);
 
     }
 
